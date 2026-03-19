@@ -1,53 +1,86 @@
-# Welcome to your Lovable project
+# Castle Quest Scoreboard
 
-## Project info
+A medieval-themed tournament scoreboard for tracking scores across multiple mini-games. Built for game masters and event organizers running team-based competitions with a fantasy medieval setting.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Features
 
-## How can I edit this code?
+- **Multi-game score tracking** — add and remove named games, enter per-team scores for each round
+- **Live leaderboard** — auto-sorted by total points across all games; the leader is crowned with a gold crown icon
+- **Dual-mode timer** — switchable between **countdown** (configurable minutes/seconds, with a "TIME'S UP" alert) and **stopwatch** modes; supports start, pause, and reset; turns red when under 10 seconds
+- **Four fixed teams** — Red Knights, Blue Dragons, Green Rangers, and Yellow Lions, each color-coded throughout the UI
+- **Medieval aesthetic** — custom fonts, gold color scheme, ornate borders, and a parchment texture background
 
-There are several ways of editing your application.
+## Teams
 
-**Use Lovable**
+| Team | Color |
+|---|---|
+| Red Knights | Red |
+| Blue Dragons | Blue |
+| Green Rangers | Green |
+| Yellow Lions | Yellow |
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
+## Tech Stack
 
-Changes made via Lovable will be committed automatically to this repo.
+| Layer | Technology |
+|---|---|
+| Framework | React 18 + TypeScript |
+| Build tool | Vite |
+| Routing | React Router v6 |
+| Server state | TanStack React Query v5 |
+| UI components | shadcn/ui (Radix UI) |
+| Styling | Tailwind CSS |
+| Icons | Lucide React |
+| Testing | Vitest + Playwright |
 
-**Use your preferred IDE**
+## Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
+**Requirements:** Node.js 18+ installed — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
+# 1. Clone the repository
 git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+# 2. Navigate to the project directory
+cd castle-quest-scoreboard
 
-# Step 3: Install the necessary dependencies.
-npm i
+# 3. Install dependencies
+npm install
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# 4. Start the development server
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+The app will be available at `http://localhost:8080`.
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## Available Scripts
 
-**Use GitHub Codespaces**
+| Script | Description |
+|---|---|
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run build:dev` | Build in development mode |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Lint all files with ESLint |
+| `npm run test` | Run tests once with Vitest |
+| `npm run test:watch` | Run tests in watch mode |
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── GameManager.tsx    # Add/delete games; per-team score input grid
+│   ├── Scoreboard.tsx     # Aggregated leaderboard sorted by total points
+│   ├── TimerSection.tsx   # Timer UI with countdown and stopwatch modes
+│   └── ui/                # shadcn/ui component library
+├── hooks/
+│   └── useTimer.ts        # Custom hook with all timer logic
+├── pages/
+│   └── Index.tsx          # Root page; owns all state and composes panels
+├── types/
+│   └── game.ts            # Game/Team interfaces, TEAMS constant, color helpers
+└── App.tsx                # App shell with providers (Query, Router, Toasts)
+```
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
 ## What technologies are used for this project?
