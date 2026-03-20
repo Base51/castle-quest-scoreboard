@@ -134,11 +134,11 @@ const Index = () => {
         {/* Timer */}
         <TimerSection timer={timer} />
 
-        {/* Team Management */}
-        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} onDeleteTeam={deleteTeam} />
-
         {/* Scoreboard */}
         <Scoreboard games={games} teams={teams} />
+
+        {/* Team Management */}
+        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} onDeleteTeam={deleteTeam} />
 
         {/* Game Management */}
         <GameManager
