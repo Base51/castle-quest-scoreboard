@@ -1,4 +1,4 @@
-import { Plus, Users } from "lucide-react";
+import { Plus, Trash2, Users } from "lucide-react";
 import { useState } from "react";
 import type { Team } from "@/types/game";
 import { Button } from "@/components/ui/button";
@@ -8,9 +8,10 @@ interface TeamManagerProps {
   teams: Team[];
   onAddTeam: (name: string, color: string) => void;
   onUpdateTeam: (teamId: string, updates: Partial<Pick<Team, "name" | "color">>) => void;
+  onDeleteTeam: (teamId: string) => void;
 }
 
-export function TeamManager({ teams, onAddTeam, onUpdateTeam }: TeamManagerProps) {
+export function TeamManager({ teams, onAddTeam, onUpdateTeam, onDeleteTeam }: TeamManagerProps) {
   const [newTeamName, setNewTeamName] = useState("");
   const [newTeamColor, setNewTeamColor] = useState("#7c3aed");
 
@@ -74,6 +75,18 @@ export function TeamManager({ teams, onAddTeam, onUpdateTeam }: TeamManagerProps
                 <span className="w-24 font-mono text-xs text-muted-foreground uppercase">
                   {team.color}
                 </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => onDeleteTeam(team.id)}
+                  disabled={teams.length === 1}
+                  className="text-muted-foreground hover:text-destructive"
+                  title={teams.length === 1 ? "At least one team is required" : `Remove ${team.name}`}
+                  aria-label={`Remove team ${team.name}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </div>

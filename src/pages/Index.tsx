@@ -46,6 +46,33 @@ const Index = () => {
     setTeams((prev) => prev.map((team) => (team.id === teamId ? { ...team, ...updates } : team)));
   }, []);
 
+  const deleteTeam = useCallback((teamId: string) => {
+    const team = teams.find((t) => t.id === teamId);
+    if (!team) return;
+
+    if (teams.length === 1) {
+      window.alert("At least one team is required.");
+      return;
+    }
+
+    const hasExistingScores = games.some((game) => (game.scores[teamId] || 0) > 0);
+    const message = hasExistingScores
+      ? `Remove ${team.name}? Existing scores for this team will be permanently removed from all games.`
+      : `Remove ${team.name}?`;
+
+    if (!window.confirm(message)) return;
+
+    setTeams((prev) => prev.filter((t) => t.id !== teamId));
+
+    setGames((prev) =>
+      prev.map((game) => {
+        if (!(teamId in game.scores)) return game;
+        const { [teamId]: _removed, ...restScores } = game.scores;
+        return { ...game, scores: restScores };
+      })
+    );
+  }, [games, teams]);
+
   return (
     <div className="min-h-screen bg-background bg-parchment-texture">
       {/* Header */}
@@ -67,7 +94,7 @@ const Index = () => {
         <TimerSection timer={timer} />
 
         {/* Team Management */}
-        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} />
+        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} onDeleteTeam={deleteTeam} />
 
         {/* Scoreboard */}
         <Scoreboard games={games} teams={teams} />
