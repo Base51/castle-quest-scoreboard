@@ -3,12 +3,14 @@ import { Swords } from "lucide-react";
 import { TimerSection } from "@/components/TimerSection";
 import { Scoreboard } from "@/components/Scoreboard";
 import { GameManager } from "@/components/GameManager";
+import { TeamManager } from "@/components/TeamManager";
 import { useTimer } from "@/hooks/useTimer";
-import type { Game } from "@/types/game";
+import { DEFAULT_TEAMS, type Game, type Team } from "@/types/game";
 
 const Index = () => {
   const timer = useTimer();
   const [games, setGames] = useState<Game[]>([]);
+  const [teams, setTeams] = useState<Team[]>(DEFAULT_TEAMS);
 
   const addGame = useCallback((name: string) => {
     setGames((prev) => [
@@ -27,6 +29,21 @@ const Index = () => {
 
   const deleteGame = useCallback((gameId: string) => {
     setGames((prev) => prev.filter((g) => g.id !== gameId));
+  }, []);
+
+  const addTeam = useCallback((name: string, color: string) => {
+    setTeams((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        name,
+        color,
+      },
+    ]);
+  }, []);
+
+  const updateTeam = useCallback((teamId: string, updates: Partial<Pick<Team, "name" | "color">>) => {
+    setTeams((prev) => prev.map((team) => (team.id === teamId ? { ...team, ...updates } : team)));
   }, []);
 
   return (
@@ -49,11 +66,15 @@ const Index = () => {
         {/* Timer */}
         <TimerSection timer={timer} />
 
+        {/* Team Management */}
+        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} />
+
         {/* Scoreboard */}
-        <Scoreboard games={games} />
+        <Scoreboard games={games} teams={teams} />
 
         {/* Game Management */}
         <GameManager
+          teams={teams}
           games={games}
           onAddGame={addGame}
           onUpdateScore={updateScore}

@@ -1,12 +1,26 @@
 import { Crown, Shield } from "lucide-react";
-import { TEAMS, type Game, type Team, getTeamColorClass } from "@/types/game";
+import type { Game, Team } from "@/types/game";
 
 interface ScoreboardProps {
   games: Game[];
+  teams: Team[];
 }
 
-export function Scoreboard({ games }: ScoreboardProps) {
-  const totals = TEAMS.map((team) => ({
+function toMutedColor(hex: string, opacity = 0.18): string {
+  const clean = hex.replace("#", "");
+  const valid = /^[0-9A-Fa-f]{3}$|^[0-9A-Fa-f]{6}$/.test(clean);
+  if (!valid) return "rgba(255, 255, 255, 0.08)";
+
+  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+  const r = Number.parseInt(full.slice(0, 2), 16);
+  const g = Number.parseInt(full.slice(2, 4), 16);
+  const b = Number.parseInt(full.slice(4, 6), 16);
+
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
+}
+
+export function Scoreboard({ games, teams }: ScoreboardProps) {
+  const totals = teams.map((team) => ({
     team,
     total: games.reduce((sum, g) => sum + (g.scores[team.id] || 0), 0),
   })).sort((a, b) => b.total - a.total);
@@ -24,7 +38,11 @@ export function Scoreboard({ games }: ScoreboardProps) {
         {totals.map((entry, index) => (
           <div
             key={entry.team.id}
-            className={`flex items-center gap-4 rounded-lg p-4 border ${getTeamColorClass(entry.team.color, "border")} ${getTeamColorClass(entry.team.color, "bg-muted")} transition-all`}
+            className="flex items-center gap-4 rounded-lg p-4 border transition-all"
+            style={{
+              borderColor: entry.team.color,
+              backgroundColor: toMutedColor(entry.team.color),
+            }}
           >
             {/* Rank */}
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-card font-cinzel text-lg font-bold">
@@ -36,11 +54,11 @@ export function Scoreboard({ games }: ScoreboardProps) {
             </div>
 
             {/* Team Color Bar */}
-            <div className={`h-10 w-2 rounded-full ${getTeamColorClass(entry.team.color, "bg")}`} />
+            <div className="h-10 w-2 rounded-full" style={{ backgroundColor: entry.team.color }} />
 
             {/* Team Name */}
             <div className="flex-1">
-              <p className={`font-cinzel font-bold text-lg ${getTeamColorClass(entry.team.color, "text")}`}>
+              <p className="font-cinzel font-bold text-lg" style={{ color: entry.team.color }}>
                 {entry.team.name}
               </p>
             </div>

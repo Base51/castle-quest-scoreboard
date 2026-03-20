@@ -1,17 +1,18 @@
 import { Plus, Trash2, Swords } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { TEAMS, type Game, getTeamColorClass } from "@/types/game";
+import type { Game, Team } from "@/types/game";
 import { useState } from "react";
 
 interface GameManagerProps {
+  teams: Team[];
   games: Game[];
   onAddGame: (name: string) => void;
   onUpdateScore: (gameId: string, teamId: string, score: number) => void;
   onDeleteGame: (gameId: string) => void;
 }
 
-export function GameManager({ games, onAddGame, onUpdateScore, onDeleteGame }: GameManagerProps) {
+export function GameManager({ teams, games, onAddGame, onUpdateScore, onDeleteGame }: GameManagerProps) {
   const [newGameName, setNewGameName] = useState("");
 
   const handleAdd = () => {
@@ -63,9 +64,9 @@ export function GameManager({ games, onAddGame, onUpdateScore, onDeleteGame }: G
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {TEAMS.map((team) => (
+                {teams.map((team) => (
                   <div key={team.id} className="flex flex-col items-center gap-1">
-                    <label className={`text-xs font-cinzel font-semibold ${getTeamColorClass(team.color, "text")}`}>
+                    <label className="text-xs font-cinzel font-semibold" style={{ color: team.color }}>
                       {team.name}
                     </label>
                     <Input
@@ -73,7 +74,8 @@ export function GameManager({ games, onAddGame, onUpdateScore, onDeleteGame }: G
                       min="0"
                       value={game.scores[team.id] || 0}
                       onChange={(e) => onUpdateScore(game.id, team.id, parseInt(e.target.value) || 0)}
-                      className={`w-full text-center font-medieval text-lg h-10 ${getTeamColorClass(team.color, "border")}`}
+                      className="w-full text-center font-medieval text-lg h-10"
+                      style={{ borderColor: team.color }}
                     />
                   </div>
                 ))}
