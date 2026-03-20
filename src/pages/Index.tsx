@@ -130,24 +130,28 @@ const Index = () => {
         </p>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8 space-y-8">
-        {/* Timer */}
-        <TimerSection timer={timer} />
+      <main className="mx-auto w-full max-w-[1700px] px-4 py-8 space-y-6">
+        <section className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+          {/* Timer */}
+          <TimerSection timer={timer} />
 
-        {/* Scoreboard */}
-        <Scoreboard games={games} teams={teams} />
+          {/* Scoreboard */}
+          <Scoreboard games={games} teams={teams} />
+        </section>
 
-        {/* Team Management */}
-        <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} onDeleteTeam={deleteTeam} />
+        <section className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+          {/* Team Management */}
+          <TeamManager teams={teams} onAddTeam={addTeam} onUpdateTeam={updateTeam} onDeleteTeam={deleteTeam} />
 
-        {/* Game Management */}
-        <GameManager
-          teams={teams}
-          games={games}
-          onAddGame={addGame}
-          onUpdateScore={updateScore}
-          onDeleteGame={deleteGame}
-        />
+          {/* Game Management */}
+          <GameManager
+            teams={teams}
+            games={games}
+            onAddGame={addGame}
+            onUpdateScore={updateScore}
+            onDeleteGame={deleteGame}
+          />
+        </section>
       </main>
     </div>
   );
