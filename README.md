@@ -68,6 +68,7 @@ The app will be available at `http://localhost:8080`.
 
 ```
 src/
+├── audio/                 # Audio files and sound effects
 ├── components/
 │   ├── GameManager.tsx    # Add/delete games; per-team score input grid
 │   ├── Scoreboard.tsx     # Aggregated leaderboard sorted by total points

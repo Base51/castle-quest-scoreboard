@@ -2,7 +2,8 @@ import { Play, Pause, RotateCcw, Timer, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useTimer, formatTime, type TimerMode } from "@/hooks/useTimer";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import endTimerAudio from "@/audio/end-timer.mp3";
 
 interface TimerSectionProps {
   timer: ReturnType<typeof useTimer>;
@@ -11,7 +12,16 @@ interface TimerSectionProps {
 export function TimerSection({ timer }: TimerSectionProps) {
   const [inputMin, setInputMin] = useState("5");
   const [inputSec, setInputSec] = useState("0");
+  const audioRef = useRef<HTMLAudioElement>(null);
   const isUrgent = timer.mode === "countdown" && timer.isRunning && timer.timeMs < 10000 && timer.timeMs > 0;
+
+  // Play audio when timer finishes
+  useEffect(() => {
+    if (timer.isFinished && audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.play().catch((error) => console.error("Error playing end timer audio:", error));
+    }
+  }, [timer.isFinished]);
 
   const handleSetCountdown = () => {
     const ms = (parseInt(inputMin || "0") * 60 + parseInt(inputSec || "0")) * 1000;
@@ -97,6 +107,9 @@ export function TimerSection({ timer }: TimerSectionProps) {
           <RotateCcw className="h-4 w-4" /> Reset
         </Button>
       </div>
+
+      {/* Hidden audio element for timer end sound */}
+      <audio ref={audioRef} src={endTimerAudio} />
     </div>
   );
 }
