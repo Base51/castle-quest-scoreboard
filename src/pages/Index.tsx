@@ -1,17 +1,32 @@
-import { useState, useCallback } from "react";
-import { Swords } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
+import { Maximize2, Minimize2, Swords } from "lucide-react";
 import { TimerSection } from "@/components/TimerSection";
 import { Scoreboard } from "@/components/Scoreboard";
 import { GameManager } from "@/components/GameManager";
 import { TeamManager } from "@/components/TeamManager";
 import { useTimer } from "@/hooks/useTimer";
 import { DEFAULT_TEAMS, type Game, type Team } from "@/types/game";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const Index = () => {
   const timer = useTimer();
   const [games, setGames] = useState<Game[]>([]);
   const [teams, setTeams] = useState<Team[]>(DEFAULT_TEAMS);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+
+    handleFullscreenChange();
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
 
   const addGame = useCallback((name: string) => {
     setGames((prev) => [
@@ -114,10 +129,34 @@ const Index = () => {
     });
   }, [games, teams]);
 
+  const toggleFullscreen = useCallback(async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await document.documentElement.requestFullscreen();
+      } else {
+        await document.exitFullscreen();
+      }
+    } catch {
+      toast.error("Fullscreen is not available in this browser.");
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-background bg-parchment-texture">
       {/* Header */}
-      <header className="border-b border-gold-dim py-6 text-center">
+      <header className="relative border-b border-gold-dim py-6 text-center">
+        <div className="absolute right-4 top-4">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={toggleFullscreen}
+            className="font-cinzel gap-2"
+            aria-label={isFullscreen ? "Exit fullscreen mode" : "Enter fullscreen mode"}
+          >
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+          </Button>
+        </div>
         <div className="flex items-center justify-center gap-3">
           <Swords className="h-8 w-8 text-gold" />
           <h1 className="font-medieval text-4xl md:text-5xl text-gold text-shadow-gold tracking-wide">
