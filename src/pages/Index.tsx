@@ -6,6 +6,7 @@ import { GameManager } from "@/components/GameManager";
 import { TeamManager } from "@/components/TeamManager";
 import { useTimer } from "@/hooks/useTimer";
 import { DEFAULT_TEAMS, type Game, type Team } from "@/types/game";
+import { toast } from "sonner";
 
 const Index = () => {
   const timer = useTimer();
@@ -49,13 +50,19 @@ const Index = () => {
   const deleteTeam = useCallback((teamId: string) => {
     const team = teams.find((t) => t.id === teamId);
     if (!team) return;
+    const teamIndex = teams.findIndex((t) => t.id === teamId);
 
     if (teams.length === 1) {
       window.alert("At least one team is required.");
       return;
     }
 
-    const hasExistingScores = games.some((game) => (game.scores[teamId] || 0) > 0);
+    const hasExistingScores = games.some((game) => Object.prototype.hasOwnProperty.call(game.scores, teamId));
+    const removedScores = games.flatMap((game) =>
+      Object.prototype.hasOwnProperty.call(game.scores, teamId)
+        ? [{ gameId: game.id, score: game.scores[teamId] }]
+        : []
+    );
     const message = hasExistingScores
       ? `Remove ${team.name}? Existing scores for this team will be permanently removed from all games.`
       : `Remove ${team.name}?`;
@@ -71,6 +78,40 @@ const Index = () => {
         return { ...game, scores: restScores };
       })
     );
+
+    toast(`${team.name} removed`, {
+      description: "Team and related scores were removed.",
+      duration: 5000,
+      action: {
+        label: "Undo",
+        onClick: () => {
+          setTeams((prev) => {
+            if (prev.some((t) => t.id === team.id)) return prev;
+
+            const next = [...prev];
+            const safeIndex = Math.max(0, Math.min(teamIndex, next.length));
+            next.splice(safeIndex, 0, team);
+            return next;
+          });
+
+          const removedByGame = new Map(removedScores.map((entry) => [entry.gameId, entry.score]));
+          setGames((prev) =>
+            prev.map((game) => {
+              if (!removedByGame.has(game.id)) return game;
+              return {
+                ...game,
+                scores: {
+                  ...game.scores,
+                  [team.id]: removedByGame.get(game.id) as number,
+                },
+              };
+            })
+          );
+
+          toast.success(`${team.name} restored`);
+        },
+      },
+    });
   }, [games, teams]);
 
   return (
