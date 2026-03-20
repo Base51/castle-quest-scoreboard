@@ -8,17 +8,29 @@ interface GameManagerProps {
   teams: Team[];
   games: Game[];
   onAddGame: (name: string) => void;
+  onUpdateGameName: (gameId: string, name: string) => void;
   onUpdateScore: (gameId: string, teamId: string, score: number) => void;
   onDeleteGame: (gameId: string) => void;
 }
 
-export function GameManager({ teams, games, onAddGame, onUpdateScore, onDeleteGame }: GameManagerProps) {
+export function GameManager({ teams, games, onAddGame, onUpdateGameName, onUpdateScore, onDeleteGame }: GameManagerProps) {
   const [newGameName, setNewGameName] = useState("");
 
   const handleAdd = () => {
     const name = newGameName.trim() || `Game ${games.length + 1}`;
     onAddGame(name);
     setNewGameName("");
+  };
+
+  const handleGameNameBlur = (game: Game) => {
+    const trimmed = game.name.trim();
+    if (!trimmed) {
+      onUpdateGameName(game.id, "Untitled Game");
+      return;
+    }
+    if (trimmed !== game.name) {
+      onUpdateGameName(game.id, trimmed);
+    }
   };
 
   return (
@@ -52,7 +64,14 @@ export function GameManager({ teams, games, onAddGame, onUpdateScore, onDeleteGa
           {games.map((game) => (
             <div key={game.id} className="rounded-lg border border-border bg-secondary/50 p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="font-cinzel font-semibold text-foreground">{game.name}</h3>
+                <Input
+                  value={game.name}
+                  onChange={(e) => onUpdateGameName(game.id, e.target.value)}
+                  onBlur={() => handleGameNameBlur(game)}
+                  onKeyDown={(e) => e.key === "Enter" && (e.currentTarget as HTMLInputElement).blur()}
+                  className="max-w-sm font-cinzel font-semibold"
+                  aria-label={`Game name for ${game.name || "untitled game"}`}
+                />
                 <Button
                   variant="ghost"
                   size="icon"

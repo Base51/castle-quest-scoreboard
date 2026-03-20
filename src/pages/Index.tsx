@@ -47,6 +47,12 @@ const Index = () => {
     setGames((prev) => prev.filter((g) => g.id !== gameId));
   }, []);
 
+  const updateGameName = useCallback((gameId: string, name: string) => {
+    setGames((prev) =>
+      prev.map((g) => (g.id === gameId ? { ...g, name } : g))
+    );
+  }, []);
+
   const addTeam = useCallback((name: string, color: string) => {
     setTeams((prev) => [
       ...prev,
@@ -187,6 +193,7 @@ const Index = () => {
             teams={teams}
             games={games}
             onAddGame={addGame}
+            onUpdateGameName={updateGameName}
             onUpdateScore={updateScore}
             onDeleteGame={deleteGame}
           />
