@@ -58,14 +58,17 @@ export function Scoreboard({ games, teams }: ScoreboardProps) {
 
             {/* Team Name */}
             <div className="flex-1">
-              <p className="font-cinzel font-bold text-lg" style={{ color: entry.team.color }}>
+              <p
+                className="font-cinzel text-2xl md:text-3xl font-black tracking-wide drop-shadow-[0_2px_2px_rgba(0,0,0,0.7)]"
+                style={{ color: "#ffffff" }}
+              >
                 {entry.team.name}
               </p>
             </div>
 
             {/* Total */}
             <div className="text-right">
-              <p className="font-medieval text-3xl text-gold">{entry.total}</p>
+              <p className="font-medieval text-3xl text-white">{entry.total}</p>
               <p className="text-xs text-muted-foreground font-cinzel">points</p>
             </div>
           </div>
