@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect } from "react";
-import { Maximize2, Minimize2, Swords } from "lucide-react";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { Maximize2, Minimize2, RotateCcw, Swords } from "lucide-react";
 import { TimerSection } from "@/components/TimerSection";
 import { Scoreboard } from "@/components/Scoreboard";
 import { GameManager } from "@/components/GameManager";
@@ -9,11 +9,68 @@ import { DEFAULT_TEAMS, type Game, type Team } from "@/types/game";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
+const APP_STORAGE_KEY = "castle-quest-scoreboard:data";
+
+function loadPersistedAppData(): { games: Game[]; teams: Team[] } {
+  if (typeof window === "undefined") {
+    return { games: [], teams: DEFAULT_TEAMS };
+  }
+
+  try {
+    const raw = window.localStorage.getItem(APP_STORAGE_KEY);
+    if (!raw) {
+      return { games: [], teams: DEFAULT_TEAMS };
+    }
+
+    const parsed = JSON.parse(raw) as Partial<{ games: Game[]; teams: Team[] }>;
+
+    const teams = Array.isArray(parsed.teams)
+      ? parsed.teams.filter(
+          (team): team is Team =>
+            Boolean(team) &&
+            typeof team.id === "string" &&
+            typeof team.name === "string" &&
+            typeof team.color === "string"
+        )
+      : [];
+
+    const games = Array.isArray(parsed.games)
+      ? parsed.games.filter(
+          (game): game is Game =>
+            Boolean(game) &&
+            typeof game.id === "string" &&
+            typeof game.name === "string" &&
+            typeof game.scores === "object" &&
+            game.scores !== null
+        )
+      : [];
+
+    return {
+      games,
+      teams: teams.length > 0 ? teams : DEFAULT_TEAMS,
+    };
+  } catch {
+    return { games: [], teams: DEFAULT_TEAMS };
+  }
+}
+
 const Index = () => {
+  const initialDataRef = useRef(loadPersistedAppData());
   const timer = useTimer();
-  const [games, setGames] = useState<Game[]>([]);
-  const [teams, setTeams] = useState<Team[]>(DEFAULT_TEAMS);
+  const [games, setGames] = useState<Game[]>(initialDataRef.current.games);
+  const [teams, setTeams] = useState<Team[]>(initialDataRef.current.teams);
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(
+      APP_STORAGE_KEY,
+      JSON.stringify({ games, teams })
+    );
+  }, [games, teams]);
 
   useEffect(() => {
     const handleFullscreenChange = () => {
@@ -147,11 +204,36 @@ const Index = () => {
     }
   }, []);
 
+  const resetAllData = useCallback(() => {
+    if (!window.confirm("Reset all saved data? This will clear teams, games, scores, and timer state.")) {
+      return;
+    }
+
+    if (typeof window !== "undefined") {
+      window.localStorage.removeItem(APP_STORAGE_KEY);
+    }
+
+    setGames([]);
+    setTeams(DEFAULT_TEAMS);
+    timer.resetAll();
+    toast.success("All data has been reset.");
+  }, [timer]);
+
   return (
     <div className="min-h-screen bg-background bg-parchment-texture">
       {/* Header */}
       <header className="relative border-b border-gold-dim py-6 text-center">
-        <div className="absolute right-4 top-4">
+        <div className="absolute right-4 top-4 flex gap-2">
+          <Button
+            type="button"
+            variant="destructive"
+            onClick={resetAllData}
+            className="font-cinzel gap-2"
+            aria-label="Reset all saved data"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Reset All
+          </Button>
           <Button
             type="button"
             variant="secondary"
